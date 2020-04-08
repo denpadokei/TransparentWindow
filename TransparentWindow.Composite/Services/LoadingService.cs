@@ -2,78 +2,100 @@
 using Prism.Mvvm;
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
-using System.Windows;
-using TransparentWindow.Composite.Bases;
-using TransparentWindow.Composite.Collections;
-using TransparentWindow.Home.Models;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Threading;
+using TransparentWindow.Composite.Interfaces;
 
-namespace TransparentWindow.Home.ViewModels
+namespace TransparentWindow.Composite.Services
 {
-    public class MainMenuViewModel : ViewModelBase
+    public class LoadingService : BindableBase, ILoadingService
     {
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // プロパティ
-        /// <summary>表示用コレクション を取得、設定</summary>
-        private SyncCollection<WindowEntity> windowCollection_;
-        /// <summary>表示用コレクション を取得、設定</summary>
-        public SyncCollection<WindowEntity> WindowCollection
+        /// <summary>読み込み中かどうか を取得、設定</summary>
+        private bool isLoading_;
+        /// <summary>読み込み中かどうか を取得、設定</summary>
+        public bool IsLoading
         {
-            get => this.windowCollection_;
+            get => this.isLoading_;
 
-            set => this.SetProperty(ref this.windowCollection_, value);
-        }
-
-        /// <summary>ウインドウ数 を取得、設定</summary>
-        private int windowCount_;
-        /// <summary>ウインドウ数 を取得、設定</summary>
-        public int WindowCount
-        {
-            get => this.windowCount_;
-
-            set => this.SetProperty(ref this.windowCount_, value);
+            set => this.SetProperty(ref this.isLoading_, value);
         }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // コマンド
-        /// <summary>リセットコマンド を取得、設定</summary>
-        private DelegateCommand resetCommand_;
-        /// <summary>リセットコマンド を取得、設定</summary>
-        public DelegateCommand ResetCommand=> this.resetCommand_ ?? (this.resetCommand_ = new DelegateCommand(this.Reset));
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // コマンド用メソッド
-        private void Reset()
-        {
-            this.loadingService.Load(this.domain_.SerchWindow);
-        }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // オーバーライドメソッド
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // パブリックメソッド
+        public async void Load(Action load)
+        {
+            try {
+                this.StartLoading();
+                await this.dispatcher_?.InvokeAsync(() => load?.Invoke());
+            }
+            catch (Exception e) {
+                Debug.WriteLine(e);
+            }
+            finally {
+                this.EndLoading();
+            }
+        }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // プライベートメソッド
-        private void OnWindowCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void StartLoading()
         {
-            this.WindowCount = this.WindowCollection.Count;
+            lock (this.lockObject_) {
+                Debug.WriteLine("読み込みを開始します。");
+                this.lockCounter_++;
+                this.IsLoading = true;
+            }
+        }
+
+        private void EndLoading()
+        {
+            lock (this.lockObject_) {
+                Debug.WriteLine("読み込みを終了します。");
+                this.lockCounter_--;
+                if (this.lockCounter_ == 0) {
+                    this.IsLoading = false;
+                }
+            }
         }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // メンバ変数
-        private readonly MainMenuDomain domain_;
+        private readonly Dispatcher dispatcher_;
+
+        private readonly Object lockObject_ = new Object();
+
+        private int lockCounter_;
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // 構築・破棄
-        public MainMenuViewModel()
+        public LoadingService()
         {
-            this.domain_ = new MainMenuDomain();
-            this.WindowCollection = new SyncCollection<WindowEntity>(this.domain_.WindowCollection);
-            WeakEventManager<INotifyCollectionChanged, NotifyCollectionChangedEventArgs>.AddHandler(
-                this.WindowCollection.Items, nameof(INotifyCollectionChanged.CollectionChanged), this.OnWindowCollectionChanged);
+            // スレッドを起動して、そこで dispatcher を実行する
+            var dispatcherSource = new TaskCompletionSource<Dispatcher>();
+            var thread = new Thread(new ThreadStart(() =>
+            {
+                dispatcherSource.SetResult(Dispatcher.CurrentDispatcher);
+                Dispatcher.Run();
+            }));
+            thread.Start();
+            this.dispatcher_ = dispatcherSource.Task.Result; // メンバ変数に dispatcher を保存
+
+            // 表のディスパッチャーが終了するタイミングで、こちらのディスパッチャーも終了する
+            Dispatcher.CurrentDispatcher.ShutdownStarted += (s, e) => this.dispatcher_.BeginInvokeShutdown(DispatcherPriority.Normal);
         }
         #endregion
     }

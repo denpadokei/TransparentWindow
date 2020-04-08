@@ -4,6 +4,7 @@ using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TransparentWindow.Composite.Interfaces;
 using Unity;
 
 namespace TransparentWindow.Composite.Bases
@@ -12,6 +13,8 @@ namespace TransparentWindow.Composite.Bases
     {
         [Dependency]
         public IRegionManager regionManager;
+        [Dependency]
+        public ILoadingService loadingService;
 
         public ViewModelBase()
         {

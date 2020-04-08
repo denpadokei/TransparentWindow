@@ -1,79 +1,57 @@
-﻿using Prism.Commands;
-using Prism.Mvvm;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Windows;
-using TransparentWindow.Composite.Bases;
-using TransparentWindow.Composite.Collections;
-using TransparentWindow.Home.Models;
+using System.Text;
+using Prism.Mvvm;
+using StatefulModel;
+using TransparentWindow.Composite.Services;
 
-namespace TransparentWindow.Home.ViewModels
+namespace TransparentWindow.Home.Models
 {
-    public class MainMenuViewModel : ViewModelBase
+    public class MainMenuDomain : BindableBase
     {
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // プロパティ
-        /// <summary>表示用コレクション を取得、設定</summary>
-        private SyncCollection<WindowEntity> windowCollection_;
-        /// <summary>表示用コレクション を取得、設定</summary>
-        public SyncCollection<WindowEntity> WindowCollection
+        /// <summary>ウインドウコレクション を取得、設定</summary>
+        private ObservableSynchronizedCollection<WindowEntity> windowCollection_;
+        /// <summary>ウインドウコレクション を取得、設定</summary>
+        public ObservableSynchronizedCollection<WindowEntity> WindowCollection
         {
             get => this.windowCollection_;
 
             set => this.SetProperty(ref this.windowCollection_, value);
         }
 
-        /// <summary>ウインドウ数 を取得、設定</summary>
-        private int windowCount_;
-        /// <summary>ウインドウ数 を取得、設定</summary>
-        public int WindowCount
-        {
-            get => this.windowCount_;
-
-            set => this.SetProperty(ref this.windowCount_, value);
-        }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // コマンド
-        /// <summary>リセットコマンド を取得、設定</summary>
-        private DelegateCommand resetCommand_;
-        /// <summary>リセットコマンド を取得、設定</summary>
-        public DelegateCommand ResetCommand=> this.resetCommand_ ?? (this.resetCommand_ = new DelegateCommand(this.Reset));
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // コマンド用メソッド
-        private void Reset()
-        {
-            this.loadingService.Load(this.domain_.SerchWindow);
-        }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // オーバーライドメソッド
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // パブリックメソッド
-        #endregion
-        //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
-        #region // プライベートメソッド
-        private void OnWindowCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        public void SerchWindow()
         {
-            this.WindowCount = this.WindowCollection.Count;
+            this.WindowCollection.Clear();
+            foreach (var window in WindowManagerService.GetWindowsNames()) {
+                this.WindowCollection.Add(new WindowEntity() { WindowName = window.WindowName, WindowClassName = window.WindowClassName });
+            }
         }
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
+        #region // プライベートメソッド
+        #endregion
+        //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // メンバ変数
-        private readonly MainMenuDomain domain_;
         #endregion
         //ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*ﾟ+｡｡+ﾟ*｡+ﾟ ﾟ+｡*
         #region // 構築・破棄
-        public MainMenuViewModel()
+        public MainMenuDomain()
         {
-            this.domain_ = new MainMenuDomain();
-            this.WindowCollection = new SyncCollection<WindowEntity>(this.domain_.WindowCollection);
-            WeakEventManager<INotifyCollectionChanged, NotifyCollectionChangedEventArgs>.AddHandler(
-                this.WindowCollection.Items, nameof(INotifyCollectionChanged.CollectionChanged), this.OnWindowCollectionChanged);
+            this.WindowCollection = new ObservableSynchronizedCollection<WindowEntity>();
         }
         #endregion
     }

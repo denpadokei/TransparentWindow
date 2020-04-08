@@ -2,6 +2,8 @@
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
+using TransparentWindow.Composite.Interfaces;
+using TransparentWindow.Composite.Services;
 
 namespace TransparentWindow.Composite
 {
@@ -14,7 +16,7 @@ namespace TransparentWindow.Composite
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-
+            containerRegistry.Register<ILoadingService, LoadingService>();
         }
     }
 }
